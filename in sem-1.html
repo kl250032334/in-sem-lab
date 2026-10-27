@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Registration and Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 25px;
+            width: 320px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #aaa;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        p {
+            text-align: center;
+        }
+
+        a {
+            color: blue;
+            cursor: pointer;
+        }
+
+        #message {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Registration Form -->
+    <div id="signup">
+        <h2>Student Sign Up</h2>
+
+        <form id="signupForm">
+            <input type="text" id="name"
+                   placeholder="Enter Name" required>
+
+            <input type="email" id="email"
+                   placeholder="Enter Email" required>
+
+            <input type="password" id="password"
+                   placeholder="Enter Password"
+                   required minlength="6">
+
+            <input type="password" id="confirmPassword"
+                   placeholder="Confirm Password" required>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <p>Already registered?
+            <a onclick="showLogin()">Login</a>
+        </p>
+    </div>
+
+    <!-- Login Form -->
+    <div id="login" class="hidden">
+        <h2>Student Login</h2>
+
+        <form id="loginForm">
+            <input type="email" id="loginEmail"
+                   placeholder="Enter Email" required>
+
+            <input type="password" id="loginPassword"
+                   placeholder="Enter Password" required>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <p>New user?
+            <a onclick="showSignup()">Sign Up</a>
+        </p>
+    </div>
+
+    <p id="message"></p>
+
+</div>
+
+<script>
+    // Show login form
+    function showLogin() {
+        document.getElementById("signup").classList.add("hidden");
+        document.getElementById("login").classList.remove("hidden");
+        document.getElementById("message").textContent = "";
+    }
+
+    // Show registration form
+    function showSignup() {
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("signup").classList.remove("hidden");
+        document.getElementById("message").textContent = "";
+    }
+
+    // Registration
+    document.getElementById("signupForm")
+        .addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim().toLowerCase();
+            const password = document.getElementById("password").value;
+            const confirmPassword =
+                document.getElementById("confirmPassword").value;
+
+            const message = document.getElementById("message");
+
+            if (password !== confirmPassword) {
+                message.style.color = "red";
+                message.textContent = "Passwords do not match!";
+                return;
+            }
+
+            if (localStorage.getItem("user_" + email)) {
+                message.style.color = "red";
+                message.textContent = "Email already registered!";
+                return;
+            }
+
+            const user = {
+                name: name,
+                email: email,
+                password: password
+            };
+
+            localStorage.setItem("user_" + email, JSON.stringify(user));
+
+            message.style.color = "green";
+            message.textContent = "Registration successful!";
+
+            document.getElementById("signupForm").reset();
+
+            setTimeout(showLogin, 1000);
+        });
+
+    // Login validation
+    document.getElementById("loginForm")
+        .addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const email = document.getElementById("loginEmail")
+                .value.trim().toLowerCase();
+            const password = document.getElementById("loginPassword").value;
+
+            const message = document.getElementById("message");
+            const storedUser = localStorage.getItem("user_" + email);
+
+            if (!storedUser) {
+                message.style.color = "red";
+                message.textContent = "User not registered!";
+                return;
+            }
+
+            const user = JSON.parse(storedUser);
+
+            if (user.password === password) {
+                message.style.color = "green";
+                message.textContent =
+                    "Login successful! Welcome, " + user.name + "!";
+                document.getElementById("loginForm").reset();
+            } else {
+                message.style.color = "red";
+                message.textContent = "Incorrect password!";
+            }
+        });
+</script>
+
+</body>
+</html>
